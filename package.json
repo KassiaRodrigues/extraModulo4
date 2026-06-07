@@ -1,0 +1,19 @@
+{
+  "name": "extramodulo4",
+  "version": "1.0.0",
+  "description": "Pipeline CI com Jenkins e GitHub Actions - Exercicio Extra Modulo 4",
+  "main": "src/calculator.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "build": "echo Build concluido com sucesso"
+  },
+  "jest": {
+    "coverageReporters": ["text", "lcov", "json-summary"]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}
