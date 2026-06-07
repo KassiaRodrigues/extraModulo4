@@ -7,34 +7,27 @@ on:
     branches: [main]
 
 jobs:
+  # ── JOB 1: roda no runner gerenciado pelo GitHub ──────────────────────────
   build-and-test:
-    name: Install, Test e Build
+    name: Install, Test e Build (GitHub-hosted)
     runs-on: ubuntu-latest
 
     steps:
-      # ── PASSO 1: baixa o código do repositório ──────────────────────────────
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      # ── PASSO 2: configura o Node.js com cache de dependências ──────────────
       - name: Configurar Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
 
-      # ── PASSO 3: instala as dependências ────────────────────────────────────
       - name: Instalar dependências
         run: npm install
 
-      # ── PASSO 4: executa os testes e gera relatório de cobertura ────────────
       - name: Executar testes com cobertura
         run: npm test
 
-      # ── PASSO 5 (MARKETPLACE): posta o relatório de cobertura no PR ─────────
-      # Action: https://github.com/marketplace/actions/jest-coverage-report
-      # Lê o coverage-summary.json gerado pelo Jest e cria um comentário
-      # automático no Pull Request com a tabela de cobertura por arquivo.
       - name: Publicar relatório de cobertura no PR
         if: github.event_name == 'pull_request'
         uses: ArtiomTr/jest-coverage-report-action@v2
@@ -43,7 +36,6 @@ jobs:
           coverage-file: ./coverage/coverage-summary.json
           base-coverage-file: ./coverage/coverage-summary.json
 
-      # ── PASSO 6: salva o relatório como artefato para download ──────────────
       - name: Salvar relatório de cobertura como artefato
         uses: actions/upload-artifact@v4
         if: always()
@@ -52,6 +44,30 @@ jobs:
           path: coverage/
           retention-days: 7
 
-      # ── PASSO 7: executa o build ─────────────────────────────────────────────
       - name: Executar build
         run: npm run build
+
+  # ── JOB 2: roda no self-hosted runner (sua máquina Windows) ───────────────
+  build-and-test-self-hosted:
+    name: Install, Test e Build (Self-Hosted Windows)
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar testes com cobertura
+        run: npm test
+
+      - name: Executar build
+        run: npm run build
+
+      - name: Confirmar ambiente do runner
+        run: |
+          echo "Rodando em: $env:COMPUTERNAME"
+          echo "Sistema: $env:OS"
+          node --version
+          npm --version
